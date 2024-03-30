@@ -6,15 +6,18 @@ contract PatientManagement {
     error PatientManagement_NotAdmin();
     error PatientManagement_DidNotFindUser();
 
-    mapping(address => User) public s_addressToUser;
+    event NewPatientAdded(address indexed patientAddress);
+    event APatientIsDead(address indexed patientAddress);
+
+    mapping(address => User) private s_addressToUser;
     uint256 private s_userCount = 0;
-    address public calledBy;
-    uint256 public currentUserId;
-    Role public currentRole;
+    address private s_owner;
+    mapping(string => uint256) private s_districtToPatientCount;
 
     // creating an admin user at the time of contract deployment
     constructor() {
         addUser(
+            msg.sender,
             25, // age
             Gender.Male, // gender
             VaccineStatus.two_dose, // vaccine status
@@ -23,6 +26,7 @@ contract PatientManagement {
             false, // is dead
             Role.Admin // role
         );
+        s_owner = msg.sender;
     }
 
     enum Role {
@@ -50,6 +54,7 @@ contract PatientManagement {
     }
 
     function addUser(
+        address _patientAddress,
         uint256 _age,
         Gender _gender,
         VaccineStatus _vaccine_status,
@@ -59,7 +64,7 @@ contract PatientManagement {
         Role _role
     ) public {
         s_userCount++;
-        s_addressToUser[msg.sender] = User({
+        s_addressToUser[_patientAddress] = User({
             id: s_userCount,
             age: _age,
             gender: _gender,
@@ -69,6 +74,8 @@ contract PatientManagement {
             is_dead: _is_dead,
             role: _role
         });
+
+        emit NewPatientAdded(_patientAddress);
     }
 
     function getUser(
@@ -106,17 +113,22 @@ contract PatientManagement {
         VaccineStatus _vaccine_status,
         bool _is_dead
     ) public {
-        calledBy = msg.sender;
-        currentRole = Role(s_addressToUser[msg.sender].role);
-        currentUserId = s_addressToUser[msg.sender].id;
         if (Role(s_addressToUser[msg.sender].role) != Role.Admin) {
             revert PatientManagement_NotAdmin();
         }
         s_addressToUser[_address].vaccine_status = _vaccine_status;
         s_addressToUser[_address].is_dead = _is_dead;
+
+        if (_is_dead) {
+            emit APatientIsDead(_address);
+        }
     }
 
     function getUserCount() public view returns (uint256) {
         return s_userCount;
+    }
+
+    function getOwner() public view returns (address) {
+        return s_owner;
     }
 }
