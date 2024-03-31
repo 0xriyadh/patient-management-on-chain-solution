@@ -10,12 +10,12 @@ contract PatientManagement {
     event NewPatientAdded(
         address indexed patientAddress,
         uint256 indexed age,
-        string indexed district
+        string district
     );
     event APatientIsDead(
         address indexed patientAddress,
         uint256 indexed age,
-        string indexed district
+        string district
     );
 
     mapping(address => User) private s_addressToUser;

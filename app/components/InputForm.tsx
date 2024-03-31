@@ -55,8 +55,9 @@ export function InputForm() {
     const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
         []
     );
+    const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
-
+    const [userUpdated, setUserUpdated] = useState(false);
     const patientManagementContract = useMemo(() => {
         const address =
             PatientManagementContractDeployment.networks[5777].address;
@@ -93,7 +94,7 @@ export function InputForm() {
                     0,
                     "Dhaka",
                     "No Symptoms",
-                    false,
+                    true,
                     0
                 )
                 .send({ from: connectedAccount || "" })
@@ -149,17 +150,21 @@ export function InputForm() {
 
                 setNewPatientAddedEvents(events);
                 console.log(events);
-                for (const event of events) {
-                    const block = await provider.eth.getBlock(
-                        event.blockNumber
-                    );
-                    const timestamp = block.timestamp;
 
-                    console.log(
-                        "Event emitted at",
-                        new Date(Number(timestamp) * 1000)
-                    );
-                }
+                // consoling the times each events were emitted at
+                /*
+                    for (const event of events) {
+                        const block = await provider.eth.getBlock(
+                            event.blockNumber
+                        );
+                        const timestamp = block.timestamp;
+
+                        console.log(
+                            "Event emitted at",
+                            new Date(Number(timestamp) * 1000)
+                        );
+                    }
+                */
 
                 // calculating from first block to latest
                 /*
@@ -217,6 +222,35 @@ export function InputForm() {
             setUserAdded(false);
         }
     }, [patientManagementContract, userAdded, NewPatientAddedEvents.length]);
+
+    useEffect(() => {
+        const getPastEvents = async () => {
+            if (patientManagementContract) {
+                const events = await (
+                    patientManagementContract.getPastEvents as any
+                )("APatientIsDead", {
+                    fromBlock: 0,
+                    toBlock: "latest",
+                });
+
+                setNewPatientAddedEvents(events);
+                console.log(events);
+            }
+        };
+
+        // Only get past events if a new user has been added
+        if (userUpdated || userAdded || !APatientIsDeadEvents.length) {
+            getPastEvents();
+            // Reset userAdded to false after getting past events
+            setUserUpdated(false);
+            setUserAdded(false);
+        }
+    }, [
+        patientManagementContract,
+        userAdded,
+        userUpdated,
+        APatientIsDeadEvents.length,
+    ]);
 
     return (
         <>
