@@ -157,7 +157,7 @@ export function InputForm() {
 
                     console.log(
                         "Event emitted at",
-                        new Date(Number(block.timestamp) * 1000)
+                        new Date(Number(timestamp) * 1000)
                     );
                 }
             }
