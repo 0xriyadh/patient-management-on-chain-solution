@@ -88,6 +88,10 @@ contract PatientManagement {
         });
 
         emit NewPatientAdded(_patientAddress, _age, _district);
+
+        if (_is_dead == true) {
+            emit APatientIsDead(_patientAddress, _age, _district);
+        }
     }
 
     function getUser(
