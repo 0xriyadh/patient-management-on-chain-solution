@@ -5,14 +5,22 @@ pragma solidity ^0.8.24;
 contract PatientManagement {
     error PatientManagement_NotAdmin();
     error PatientManagement_DidNotFindUser();
+    error PatientManagement_UserAlreadyExists();
 
-    event NewPatientAdded(address indexed patientAddress);
-    event APatientIsDead(address indexed patientAddress);
+    event NewPatientAdded(
+        address indexed patientAddress,
+        uint256 indexed age,
+        string indexed district
+    );
+    event APatientIsDead(
+        address indexed patientAddress,
+        uint256 indexed age,
+        string indexed district
+    );
 
     mapping(address => User) private s_addressToUser;
     uint256 private s_userCount = 0;
     address private s_owner;
-    mapping(string => uint256) private s_districtToPatientCount;
 
     // creating an admin user at the time of contract deployment
     constructor() {
@@ -63,6 +71,10 @@ contract PatientManagement {
         bool _is_dead,
         Role _role
     ) public {
+        if (s_addressToUser[_patientAddress].id != 0) {
+            revert PatientManagement_UserAlreadyExists();
+        }
+
         s_userCount++;
         s_addressToUser[_patientAddress] = User({
             id: s_userCount,
@@ -75,7 +87,7 @@ contract PatientManagement {
             role: _role
         });
 
-        emit NewPatientAdded(_patientAddress);
+        emit NewPatientAdded(_patientAddress, _age, _district);
     }
 
     function getUser(
@@ -120,7 +132,11 @@ contract PatientManagement {
         s_addressToUser[_address].is_dead = _is_dead;
 
         if (_is_dead) {
-            emit APatientIsDead(_address);
+            emit APatientIsDead(
+                _address,
+                s_addressToUser[_address].age,
+                s_addressToUser[_address].district
+            );
         }
     }
 

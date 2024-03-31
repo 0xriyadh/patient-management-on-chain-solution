@@ -3,11 +3,11 @@
 import { Web3 } from "web3";
 import MyNameContractDeployment from "../../build/contracts/MyName.json";
 import PatientManagementContractDeployment from "../../build/contracts/PatientManagement.json";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { isAddress } from "ethers";
 
 import { Button } from "@/components/ui/button";
@@ -49,13 +49,21 @@ const FormSchema = z.object({
 
 export function InputForm() {
     const [owner, setOwner] = useState<string | null>("null");
-    const [connectedAccount, setConnectedAccount] = useState("null");
-
-    const address = PatientManagementContractDeployment.networks[5777].address;
-    const patientManagementContract = new provider.eth.Contract(
-        PatientManagementContractDeployment.abi,
-        address
+    const [connectedAccount, setConnectedAccount] = useState<string | null>(
+        "null"
     );
+    const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
+        []
+    );
+
+    const patientManagementContract = useMemo(() => {
+        const address =
+            PatientManagementContractDeployment.networks[5777].address;
+        return new provider.eth.Contract(
+            PatientManagementContractDeployment.abi,
+            address
+        );
+    }, []);
 
     const getOwnerAddress = async (): Promise<string> => {
         const result = (await patientManagementContract.methods
@@ -145,6 +153,7 @@ export function InputForm() {
                     toBlock: "latest",
                 });
 
+                setNewPatientAddedEvents(events);
                 console.log(events);
                 for (const event of events) {
                     const block = await provider.eth.getBlock(
