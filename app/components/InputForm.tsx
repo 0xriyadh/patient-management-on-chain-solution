@@ -55,6 +55,7 @@ export function InputForm() {
     const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
         []
     );
+    const [userAdded, setUserAdded] = useState(false);
 
     const patientManagementContract = useMemo(() => {
         const address =
@@ -101,6 +102,7 @@ export function InputForm() {
                 // })
                 .then(() => {
                     console.log("Success");
+                    setUserAdded(true);
                 })
                 .catch((err: Error) => {
                     console.error(err.message);
@@ -136,14 +138,6 @@ export function InputForm() {
     });
 
     useEffect(() => {
-        patientManagementContract.events
-            .NewPatientAdded()
-            .on("data", async (event) => {
-                console.log(event);
-            });
-    }, [patientManagementContract.events]);
-
-    useEffect(() => {
         const getPastEvents = async () => {
             if (patientManagementContract) {
                 const events = await (
@@ -169,8 +163,13 @@ export function InputForm() {
             }
         };
 
-        getPastEvents();
-    }, [patientManagementContract]);
+        // Only get past events if a new user has been added
+        if (userAdded || !NewPatientAddedEvents.length) {
+            getPastEvents();
+            // Reset userAdded to false after getting past events
+            setUserAdded(false);
+        }
+    }, [patientManagementContract, userAdded, NewPatientAddedEvents.length]);
 
     return (
         <>
