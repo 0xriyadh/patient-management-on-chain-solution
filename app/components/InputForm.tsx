@@ -58,6 +58,11 @@ export function InputForm() {
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
+    // death rate per day
+    const [deathRate, setDeathRate] = useState(0);
+    // total num of days since the first block was created
+    const [totalDays, setTotalDays] = useState(0);
+
     const patientManagementContract = useMemo(() => {
         const address =
             PatientManagementContractDeployment.networks[5777].address;
@@ -94,7 +99,7 @@ export function InputForm() {
                     0,
                     "Dhaka",
                     "No Symptoms",
-                    true,
+                    false,
                     0
                 )
                 .send({ from: connectedAccount || "" })
@@ -211,6 +216,7 @@ export function InputForm() {
                         "Number of days from the first block to the current time:",
                         days
                     );
+                    setTotalDays(days);
                 }
             }
         };
@@ -252,10 +258,17 @@ export function InputForm() {
         APatientIsDeadEvents.length,
     ]);
 
+    useEffect(() => {
+        if (totalDays > 0) {
+            setDeathRate(NewPatientAddedEvents.length / totalDays);
+        }
+    }, [totalDays, NewPatientAddedEvents.length]);
+
     return (
         <>
             <h1 className="text-2xl">Owner Address: {owner}</h1>
             <h1 className="text-2xl">Connected Account: {connectedAccount}</h1>
+            <h1 className="text-lg">Death Rate: {deathRate}</h1>
             <Button type="submit" onClick={connectMetamask}>
                 Connect to MetaMask
             </Button>
