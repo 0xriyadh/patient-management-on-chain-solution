@@ -161,6 +161,32 @@ export function InputForm() {
                     );
                 }
 
+                // calculating from first block to latest
+                /*
+                    if (events.length > 0) {
+                        // Get the timestamp of the first block
+                        const firstBlock = await provider.eth.getBlock(
+                            events[0].blockNumber
+                        );
+                        const firstTimestamp = firstBlock.timestamp;
+
+                        // Get the timestamp of the latest block
+                        const latestBlock = await provider.eth.getBlock("latest");
+                        const latestTimestamp = latestBlock.timestamp;
+
+                        // Calculate the number of days from the first block to the latest
+                        const days = Math.ceil(
+                            Number(latestTimestamp - firstTimestamp) /
+                                (60 * 60 * 24)
+                        );
+                        console.log(
+                            "Number of days from the first block to the latest:",
+                            days
+                        );
+                    } 
+                */
+
+                // calculating from first block to now
                 if (events.length > 0) {
                     // Get the timestamp of the first block
                     const firstBlock = await provider.eth.getBlock(
@@ -168,16 +194,16 @@ export function InputForm() {
                     );
                     const firstTimestamp = firstBlock.timestamp;
 
-                    // Get the timestamp of the latest block
-                    const latestBlock = await provider.eth.getBlock("latest");
-                    const latestTimestamp = latestBlock.timestamp;
+                    // Get the current timestamp in seconds
+                    const currentTimestamp = Math.floor(Date.now() / 1000);
 
-                    // Calculate the number of days from the first block to the latest
-                    const days =
-                        Number(latestTimestamp - firstTimestamp) /
-                        (60 * 60 * 24);
+                    // Calculate the number of days from the first block to the current time
+                    const days = Math.ceil(
+                        (currentTimestamp - Number(firstTimestamp)) /
+                            (60 * 60 * 24)
+                    );
                     console.log(
-                        "Number of days from the first block to the latest:",
+                        "Number of days from the first block to the current time:",
                         days
                     );
                 }
