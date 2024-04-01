@@ -62,6 +62,8 @@ export function InputForm() {
     const [deathRate, setDeathRate] = useState(0);
     // total num of days since the first block was created
     const [totalDays, setTotalDays] = useState(0);
+    // district with highest number of patients
+    const [highestPatientDistrict, setHighestPatientDistrict] = useState("");
 
     const patientManagementContract = useMemo(() => {
         const address =
@@ -97,7 +99,7 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Dhaka",
+                    "Barishal",
                     "No Symptoms",
                     false,
                     0
@@ -239,7 +241,7 @@ export function InputForm() {
                     toBlock: "latest",
                 });
 
-                setNewPatientAddedEvents(events);
+                setAPatientIsDeadEvents(events);
                 console.log(events);
             }
         };
@@ -260,15 +262,48 @@ export function InputForm() {
 
     useEffect(() => {
         if (totalDays > 0) {
-            setDeathRate(NewPatientAddedEvents.length / totalDays);
+            setDeathRate(APatientIsDeadEvents.length / totalDays);
         }
-    }, [totalDays, NewPatientAddedEvents.length]);
+    }, [totalDays, APatientIsDeadEvents.length]);
+
+    useEffect(() => {
+        if (NewPatientAddedEvents.length > 0) {
+            const districtPatientCount: { [district: string]: number } = {};
+
+            NewPatientAddedEvents.forEach((event) => {
+                const district = event.returnValues.district;
+                if (districtPatientCount[district]) {
+                    districtPatientCount[district]++;
+                } else {
+                    districtPatientCount[district] = 1;
+                }
+            });
+            console.log(districtPatientCount);
+            let maxDistrict = Object.keys(districtPatientCount)[0];
+            let maxCount = districtPatientCount[maxDistrict];
+
+            for (const district in districtPatientCount) {
+                if (districtPatientCount[district] > maxCount) {
+                    maxDistrict = district;
+                    maxCount = districtPatientCount[district];
+                }
+            }
+
+            console.log(
+                `District with highest number of patients: ${maxDistrict}`
+            );
+            setHighestPatientDistrict(maxDistrict);
+        }
+    }, [NewPatientAddedEvents]);
 
     return (
         <>
             <h1 className="text-2xl">Owner Address: {owner}</h1>
             <h1 className="text-2xl">Connected Account: {connectedAccount}</h1>
             <h1 className="text-lg">Death Rate: {deathRate}</h1>
+            <h1 className="text-lg">
+                Highest Covid Patient&apos;s District: {highestPatientDistrict}
+            </h1>
             <Button type="submit" onClick={connectMetamask}>
                 Connect to MetaMask
             </Button>
