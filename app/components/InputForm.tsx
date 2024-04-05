@@ -1,7 +1,7 @@
 "use client";
 
 import { Web3 } from "web3";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -21,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import provider from "../utils/web3Provider";
 import patientManagementContract from "../config/patientManagementContract";
+import { getAllUsers } from "../utils/users";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -43,6 +43,19 @@ export function InputForm() {
     const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
         []
     );
+    const [users, setUsers] = useState<
+        {
+            address: string;
+            id: string;
+            age: string;
+            gender: string;
+            vaccineStatus: string;
+            district: string;
+            symptomsDetails: string;
+            isDead: string;
+            role: string;
+        }[]
+    >([]);
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
@@ -60,38 +73,6 @@ export function InputForm() {
 
         return result;
     };
-
-    async function getAllUsers() {
-        const userAddresses = await patientManagementContract.methods
-            .getUserAddresses()
-            .call();
-
-        if (!userAddresses || userAddresses.length === 0) {
-            return [];
-        }
-
-        const users = await Promise.all(
-            userAddresses.map(async (address: string) => {
-                const user: string[] = await patientManagementContract.methods
-                    .getUser(address)
-                    .call();
-                return {
-                    address: address,
-                    id: user[0],
-                    age: user[1],
-                    gender: user[2],
-                    vaccineStatus: user[3],
-                    district: user[4],
-                    symptomsDetails: user[5],
-                    isDead: user[6],
-                    role: user[7],
-                };
-            })
-        );
-        return users;
-    }
-
-    getAllUsers().then((users) => console.log("Niceeeeeeeeeeeeeeee", users));
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -301,6 +282,15 @@ export function InputForm() {
             setHighestPatientDistrict(maxDistrict);
         }
     }, [NewPatientAddedEvents]);
+
+    useEffect(() => {
+        async function fetchUsers() {
+            const fetchedUsers = await getAllUsers();
+            setUsers(fetchedUsers);
+        }
+
+        fetchUsers();
+    }, []);
 
     return (
         <>
