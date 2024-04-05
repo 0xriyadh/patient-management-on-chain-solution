@@ -19,6 +19,7 @@ contract PatientManagement {
         bool is_dead
     );
 
+    address[] private s_userAddresses;
     mapping(address => User) private s_addressToUser;
     uint256 private s_userCount = 0;
     address private s_owner;
@@ -103,6 +104,40 @@ contract PatientManagement {
         }
     }
 
+    // function to update user's vaccine status or is_dead status. Only Admin can call this function
+    function updateUser(
+        address _address,
+        VaccineStatus _vaccine_status,
+        bool _is_dead
+    ) public {
+        if (Role(s_addressToUser[msg.sender].role) != Role.Admin) {
+            revert PatientManagement_NotAdmin();
+        }
+        s_addressToUser[_address].vaccine_status = _vaccine_status;
+        s_addressToUser[_address].is_dead = _is_dead;
+
+        if (_is_dead) {
+            emit APatientIsUpdated(
+                _address,
+                s_addressToUser[_address].age,
+                s_addressToUser[_address].district,
+                _is_dead
+            );
+        }
+    }
+
+    function getUserCount() public view returns (uint256) {
+        return s_userCount;
+    }
+
+    function getUserAddresses() public view returns (address[] memory) {
+        return s_userAddresses;
+    }
+
+    function getOwner() public view returns (address) {
+        return s_owner;
+    }
+
     function getUser(
         address _address
     )
@@ -130,35 +165,5 @@ contract PatientManagement {
             user.is_dead,
             user.role
         );
-    }
-
-    // function to update user's vaccine status or is_dead status. Only Admin can call this function
-    function updateUser(
-        address _address,
-        VaccineStatus _vaccine_status,
-        bool _is_dead
-    ) public {
-        if (Role(s_addressToUser[msg.sender].role) != Role.Admin) {
-            revert PatientManagement_NotAdmin();
-        }
-        s_addressToUser[_address].vaccine_status = _vaccine_status;
-        s_addressToUser[_address].is_dead = _is_dead;
-
-        if (_is_dead) {
-            emit APatientIsUpdated(
-                _address,
-                s_addressToUser[_address].age,
-                s_addressToUser[_address].district,
-                _is_dead
-            );
-        }
-    }
-
-    function getUserCount() public view returns (uint256) {
-        return s_userCount;
-    }
-
-    function getOwner() public view returns (address) {
-        return s_owner;
     }
 }
