@@ -80,7 +80,7 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Cumilla",
+                    "Rajsahi",
                     "No Symptoms",
                     true,
                     0
