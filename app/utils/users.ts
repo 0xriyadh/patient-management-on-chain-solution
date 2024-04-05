@@ -1,16 +1,5 @@
 import patientManagementContract from "../config/patientManagementContract";
-
-export type User = {
-    address: string;
-    id: string;
-    age: string;
-    gender: string;
-    vaccineStatus: string;
-    district: string;
-    symptomsDetails: string;
-    isDead: string;
-    role: string;
-};
+import { User } from "../types/userTypes";
 
 export async function getAllUsers(): Promise<User[]> {
     try {
@@ -24,23 +13,27 @@ export async function getAllUsers(): Promise<User[]> {
 
         const users = await Promise.all(
             userAddresses.map(async (address: string) => {
-                const user: string[] = await patientManagementContract.methods
-                    .getUser(address)
-                    .call();
+                const user: (string | boolean | number)[] =
+                    await patientManagementContract.methods
+                        .getUser(address)
+                        .call();
                 return {
                     address: address,
-                    id: user[0],
-                    age: user[1],
-                    gender: user[2],
-                    vaccineStatus: user[3],
-                    district: user[4],
-                    symptomsDetails: user[5],
-                    isDead: user[6],
-                    role: user[7],
+                    id: Number(user[0]),
+                    age: Number(user[1]),
+                    gender: user[2] as "Male" | "Female",
+                    vaccineStatus: user[3] as
+                        | "NotVaccinated"
+                        | "PartiallyVaccinated"
+                        | "FullyVaccinated",
+                    district: user[4] as string,
+                    symptomsDetails: user[5] as string,
+                    isDead: Boolean(user[6]),
+                    role: user[7] as "Admin" | "Doctor" | "Patient",
                 };
             })
         );
-        
+
         console.log("Users fetched successfully:", users);
         return users;
     } catch (error) {

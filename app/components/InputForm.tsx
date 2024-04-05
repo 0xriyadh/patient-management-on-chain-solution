@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import provider from "../utils/web3Provider";
 import patientManagementContract from "../config/patientManagementContract";
 import { getAllUsers } from "../utils/users";
+import { User } from "../types/userTypes";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -43,19 +44,7 @@ export function InputForm() {
     const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
         []
     );
-    const [users, setUsers] = useState<
-        {
-            address: string;
-            id: string;
-            age: string;
-            gender: string;
-            vaccineStatus: string;
-            district: string;
-            symptomsDetails: string;
-            isDead: string;
-            role: string;
-        }[]
-    >([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
@@ -91,9 +80,9 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Barishal",
+                    "Cumilla",
                     "No Symptoms",
-                    false,
+                    true,
                     0
                 )
                 .send({ from: connectedAccount || "" })
@@ -223,29 +212,29 @@ export function InputForm() {
         }
     }, [userAdded, NewPatientAddedEvents.length]);
 
-    useEffect(() => {
-        const getPastEvents = async () => {
-            if (patientManagementContract) {
-                const events = await (
-                    patientManagementContract.getPastEvents as any
-                )("APatientIsUpdated", {
-                    fromBlock: 0,
-                    toBlock: "latest",
-                });
+    // useEffect(() => {
+    //     const getPastEvents = async () => {
+    //         if (patientManagementContract) {
+    //             const events = await (
+    //                 patientManagementContract.getPastEvents as any
+    //             )("APatientIsUpdated", {
+    //                 fromBlock: 0,
+    //                 toBlock: "latest",
+    //             });
 
-                setAPatientIsDeadEvents(events);
-                console.log(events);
-            }
-        };
+    //             setAPatientIsDeadEvents(events);
+    //             console.log(events);
+    //         }
+    //     };
 
-        // Only get past events if a new user has been added
-        if (userUpdated || userAdded || !APatientIsDeadEvents.length) {
-            getPastEvents();
-            // Reset userAdded to false after getting past events
-            setUserUpdated(false);
-            setUserAdded(false);
-        }
-    }, [userAdded, userUpdated, APatientIsDeadEvents.length]);
+    //     // Only get past events if a new user has been added
+    //     if (userUpdated || userAdded || !APatientIsDeadEvents.length) {
+    //         getPastEvents();
+    //         // Reset userAdded to false after getting past events
+    //         setUserUpdated(false);
+    //         setUserAdded(false);
+    //     }
+    // }, [userAdded, userUpdated, APatientIsDeadEvents.length]);
 
     useEffect(() => {
         if (totalDays > 0) {
@@ -290,7 +279,22 @@ export function InputForm() {
         }
 
         fetchUsers();
-    }, []);
+
+        if (userAdded) {
+            setUserAdded(false);
+        }
+    }, [userAdded]);
+
+    useEffect(() => {
+        if (users.length > 0) {
+            const deadUsers = users.filter(
+                (user) => user.isDead === true
+            ).length;
+            const deathRate = deadUsers / totalDays;
+            setDeathRate(deathRate);
+            console.log("Death Rate:", deathRate);
+        }
+    }, [users, totalDays]);
 
     return (
         <>
