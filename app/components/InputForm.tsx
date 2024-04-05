@@ -1,13 +1,11 @@
 "use client";
 
 import { Web3 } from "web3";
-import MyNameContractDeployment from "../../build/contracts/MyName.json";
-import PatientManagementContractDeployment from "../../build/contracts/PatientManagement.json";
 import { useEffect, useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { set, z } from "zod";
+import { z } from "zod";
 import { isAddress } from "ethers";
 
 import { Button } from "@/components/ui/button";
@@ -21,18 +19,8 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
-
-// Initialize Web3 provider
-let provider: Web3;
-if (
-    typeof window !== "undefined" &&
-    typeof (window as any).ethereum !== "undefined"
-) {
-    provider = new Web3((window as any).ethereum);
-} else {
-    provider = new Web3("http://localhost:8545");
-}
+import provider from "../utils/web3Provider";
+import patientManagementContract from "../config/patientManagementContract";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -65,15 +53,6 @@ export function InputForm() {
     // district with highest number of patients
     const [highestPatientDistrict, setHighestPatientDistrict] = useState("");
 
-    const patientManagementContract = useMemo(() => {
-        const address =
-            PatientManagementContractDeployment.networks[5777].address;
-        return new provider.eth.Contract(
-            PatientManagementContractDeployment.abi,
-            address
-        );
-    }, []);
-
     const getOwnerAddress = async (): Promise<string> => {
         const result = (await patientManagementContract.methods
             .getOwner()
@@ -81,6 +60,38 @@ export function InputForm() {
 
         return result;
     };
+
+    async function getAllUsers() {
+        const userAddresses = await patientManagementContract.methods
+            .getUserAddresses()
+            .call();
+
+        if (!userAddresses || userAddresses.length === 0) {
+            return [];
+        }
+
+        const users = await Promise.all(
+            userAddresses.map(async (address: string) => {
+                const user: string[] = await patientManagementContract.methods
+                    .getUser(address)
+                    .call();
+                return {
+                    address: address,
+                    id: user[0],
+                    age: user[1],
+                    gender: user[2],
+                    vaccineStatus: user[3],
+                    district: user[4],
+                    symptomsDetails: user[5],
+                    isDead: user[6],
+                    role: user[7],
+                };
+            })
+        );
+        return users;
+    }
+
+    getAllUsers().then((users) => console.log("Niceeeeeeeeeeeeeeee", users));
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -229,14 +240,14 @@ export function InputForm() {
             // Reset userAdded to false after getting past events
             setUserAdded(false);
         }
-    }, [patientManagementContract, userAdded, NewPatientAddedEvents.length]);
+    }, [userAdded, NewPatientAddedEvents.length]);
 
     useEffect(() => {
         const getPastEvents = async () => {
             if (patientManagementContract) {
                 const events = await (
                     patientManagementContract.getPastEvents as any
-                )("APatientIsDead", {
+                )("APatientIsUpdated", {
                     fromBlock: 0,
                     toBlock: "latest",
                 });
@@ -253,12 +264,7 @@ export function InputForm() {
             setUserUpdated(false);
             setUserAdded(false);
         }
-    }, [
-        patientManagementContract,
-        userAdded,
-        userUpdated,
-        APatientIsDeadEvents.length,
-    ]);
+    }, [userAdded, userUpdated, APatientIsDeadEvents.length]);
 
     useEffect(() => {
         if (totalDays > 0) {

@@ -97,6 +97,8 @@ contract PatientManagement {
             role: _role
         });
 
+        s_userAddresses.push(_patientAddress);
+
         emit NewPatientAdded(_patientAddress, _age, _district);
 
         if (_is_dead == true) {
