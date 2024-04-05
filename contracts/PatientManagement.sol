@@ -24,6 +24,7 @@ contract PatientManagement {
 
     // creating an admin user at the time of contract deployment
     constructor() {
+        s_owner = msg.sender;
         addUser(
             msg.sender,
             25, // age
@@ -34,7 +35,6 @@ contract PatientManagement {
             false, // is dead
             Role.Admin // role
         );
-        s_owner = msg.sender;
     }
 
     enum Role {
@@ -73,6 +73,14 @@ contract PatientManagement {
     ) public {
         if (s_addressToUser[_patientAddress].id != 0) {
             revert PatientManagement_UserAlreadyExists();
+        }
+
+        if (
+            _role == Role.Admin &&
+            s_addressToUser[msg.sender].role != Role.Admin &&
+            msg.sender != s_owner
+        ) {
+            revert PatientManagement_NotAdmin();
         }
 
         s_userCount++;
