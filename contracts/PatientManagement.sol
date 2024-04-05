@@ -12,10 +12,11 @@ contract PatientManagement {
         uint256 indexed age,
         string district
     );
-    event APatientIsDead(
+    event APatientIsUpdated(
         address indexed patientAddress,
         uint256 indexed age,
-        string district
+        string district,
+        bool is_dead
     );
 
     mapping(address => User) private s_addressToUser;
@@ -98,7 +99,7 @@ contract PatientManagement {
         emit NewPatientAdded(_patientAddress, _age, _district);
 
         if (_is_dead == true) {
-            emit APatientIsDead(_patientAddress, _age, _district);
+            emit APatientIsUpdated(_patientAddress, _age, _district, _is_dead);
         }
     }
 
@@ -144,10 +145,11 @@ contract PatientManagement {
         s_addressToUser[_address].is_dead = _is_dead;
 
         if (_is_dead) {
-            emit APatientIsDead(
+            emit APatientIsUpdated(
                 _address,
                 s_addressToUser[_address].age,
-                s_addressToUser[_address].district
+                s_addressToUser[_address].district,
+                _is_dead
             );
         }
     }
