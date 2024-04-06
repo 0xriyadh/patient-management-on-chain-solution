@@ -245,7 +245,7 @@ export function InputForm() {
 
     return (
         <>
-            <div className="space-y-10 my-20">
+            <div className="space-y-10 my-10">
                 <div>
                     <h1 className="text-2xl text-center font-medium mb-3">
                         Death Rate & District with Highest Covid Patients
