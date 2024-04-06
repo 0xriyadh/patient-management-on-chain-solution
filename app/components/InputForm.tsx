@@ -24,7 +24,7 @@ import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
 import { useStatistics } from "../hooks/useStatistics";
 import { DataTable } from "./data-table";
-import { regularStatColumns } from "./columns";
+import { medianAgePerDistrictColumns, regularStatColumns } from "./columns";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -231,6 +231,14 @@ export function InputForm() {
         }
     }, [userAdded]);
 
+    useEffect(() => {
+        const test = Object.entries(medianAgeByDistrict).map(
+            ([district, age]) =>
+                ({ district, age } as { district: string; age: number })
+        );
+        console.log(test);
+    }, [medianAgeByDistrict]);
+
     return (
         <>
             <h1 className="text-2xl">Owner Address: {owner}</h1>
@@ -277,6 +285,20 @@ export function InputForm() {
                         district: highestPatientDistrict,
                     },
                 ]}
+            />
+            <DataTable
+                columns={medianAgePerDistrictColumns}
+                data={Object.entries(medianAgeByDistrict).map(
+                    ([district, age]) =>
+                        ({ district, age } as { district: string; age: number })
+                )}
+            />
+            <DataTable
+                columns={medianAgePerDistrictColumns}
+                data={Object.entries(medianAgeByDistrict).map(
+                    ([district, age]) =>
+                        ({ district, age } as { district: string; age: number })
+                )}
             />
             <Form {...form}>
                 <form

@@ -19,3 +19,19 @@ export const regularStatColumns: ColumnDef<RegularStat>[] = [
         header: "District with Highest Patients",
     },
 ];
+
+export type MedianAgePerDistrict = {
+    district: string;
+    age: number;
+};
+
+export const medianAgePerDistrictColumns: ColumnDef<MedianAgePerDistrict>[] = [
+    {
+        accessorKey: "district",
+        header: "District",
+    },
+    {
+        accessorKey: "age",
+        header: "Median Age",
+    },
+];
