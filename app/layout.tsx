@@ -22,7 +22,7 @@ export default function RootLayout({
                     <h3 className="text-2xl">🏥 Patient Management</h3>
                     <nav className="space-x-6">
                         <span>
-                            <Link href="/user/add">Add User</Link>``
+                            <Link href="/user/add">Add User</Link>
                         </span>
                         <span>
                             <Link href="/user/update">Update User</Link>
