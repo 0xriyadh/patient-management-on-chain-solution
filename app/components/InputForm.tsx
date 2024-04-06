@@ -272,6 +272,7 @@ export function InputForm() {
         }
     }, [NewPatientAddedEvents]);
 
+    // fetch users on page load
     useEffect(() => {
         async function fetchUsers() {
             const fetchedUsers = await getAllUsers();
@@ -285,6 +286,7 @@ export function InputForm() {
         }
     }, [userAdded]);
 
+    // calculate death rate after fetching users
     useEffect(() => {
         if (users.length > 0) {
             const deadUsers = users.filter(
