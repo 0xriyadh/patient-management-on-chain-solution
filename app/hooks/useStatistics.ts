@@ -72,21 +72,21 @@ export const useStatistics = (users: User[], totalDays: number) => {
 
     const calculateAgeGroupPercentages = () => {
         const ageGroups: { [ageGroup: string]: number } = {
-            children: 0,
-            teenagers: 0,
-            young: 0,
-            elder: 0,
+            Children: 0,
+            Teenagers: 0,
+            Young: 0,
+            Elder: 0,
         };
 
         users.forEach((user) => {
             if (user.age < 13) {
-                ageGroups["children"]++;
+                ageGroups["Children"]++;
             } else if (user.age < 20) {
-                ageGroups["teenagers"]++;
+                ageGroups["Teenagers"]++;
             } else if (user.age < 50) {
-                ageGroups["young"]++;
+                ageGroups["Young"]++;
             } else {
-                ageGroups["elder"]++;
+                ageGroups["Elder"]++;
             }
         });
 
