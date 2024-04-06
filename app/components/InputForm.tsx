@@ -48,10 +48,8 @@ export function InputForm() {
     const [users, setUsers] = useState<User[]>([]);
     // total num of days since the first block was created
     const [totalDays, setTotalDays] = useState(0);
-    const { deathRate, highestPatientDistrict } = useStatistics(
-        users,
-        totalDays
-    );
+    const { deathRate, highestPatientDistrict, medianAgeByDistrict } =
+        useStatistics(users, totalDays);
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
@@ -68,7 +66,7 @@ export function InputForm() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             ethAddress: "",
-            age: "1",
+            age: "",
         },
     });
 
@@ -81,9 +79,9 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Rajsahi",
+                    "Feni",
                     "No Symptoms",
-                    true,
+                    false,
                     0
                 )
                 .send({ from: connectedAccount || "" })
@@ -235,6 +233,15 @@ export function InputForm() {
             <h1 className="text-lg">
                 Highest Covid Patient&apos;s District: {highestPatientDistrict}
             </h1>
+            {/* Median Ages By District */}
+            <h1 className="text-lg">Median Ages By District:</h1>
+            <ul>
+                {Object.entries(medianAgeByDistrict).map(([district, age]) => (
+                    <li key={district}>
+                        {district}: {age}
+                    </li>
+                ))}
+            </ul>
             <Button type="submit" onClick={connectMetamask}>
                 Connect to MetaMask
             </Button>
