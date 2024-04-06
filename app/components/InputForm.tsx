@@ -38,9 +38,9 @@ const FormSchema = z.object({
 });
 
 export function InputForm() {
-    const [owner, setOwner] = useState<string | null>("null");
+    const [owner, setOwner] = useState<string | null>(null);
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
-        "null"
+        null
     );
     const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
         []
@@ -242,8 +242,12 @@ export function InputForm() {
                     </li>
                 ))}
             </ul>
-            <Button type="submit" onClick={connectMetamask}>
-                Connect to MetaMask
+            <Button disabled={!!connectedAccount} type="submit" onClick={connectMetamask}>
+                {
+                    connectedAccount
+                        ? "Metamask Connected ✅"
+                        : "Connect to Metamask"
+                }
             </Button>
             <Form {...form}>
                 <form
@@ -283,7 +287,9 @@ export function InputForm() {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button disabled={!connectedAccount} type="submit">
+                        Submit
+                    </Button>
                 </form>
             </Form>
         </>
