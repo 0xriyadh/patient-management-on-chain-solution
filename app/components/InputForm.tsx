@@ -212,66 +212,6 @@ export function InputForm() {
         }
     }, [userAdded, NewPatientAddedEvents.length]);
 
-    // useEffect(() => {
-    //     const getPastEvents = async () => {
-    //         if (patientManagementContract) {
-    //             const events = await (
-    //                 patientManagementContract.getPastEvents as any
-    //             )("APatientIsUpdated", {
-    //                 fromBlock: 0,
-    //                 toBlock: "latest",
-    //             });
-
-    //             setAPatientIsDeadEvents(events);
-    //             console.log(events);
-    //         }
-    //     };
-
-    //     // Only get past events if a new user has been added
-    //     if (userUpdated || userAdded || !APatientIsDeadEvents.length) {
-    //         getPastEvents();
-    //         // Reset userAdded to false after getting past events
-    //         setUserUpdated(false);
-    //         setUserAdded(false);
-    //     }
-    // }, [userAdded, userUpdated, APatientIsDeadEvents.length]);
-
-    useEffect(() => {
-        if (totalDays > 0) {
-            setDeathRate(APatientIsDeadEvents.length / totalDays);
-        }
-    }, [totalDays, APatientIsDeadEvents.length]);
-
-    useEffect(() => {
-        if (NewPatientAddedEvents.length > 0) {
-            const districtPatientCount: { [district: string]: number } = {};
-
-            NewPatientAddedEvents.forEach((event) => {
-                const district = event.returnValues.district;
-                if (districtPatientCount[district]) {
-                    districtPatientCount[district]++;
-                } else {
-                    districtPatientCount[district] = 1;
-                }
-            });
-            console.log(districtPatientCount);
-            let maxDistrict = Object.keys(districtPatientCount)[0];
-            let maxCount = districtPatientCount[maxDistrict];
-
-            for (const district in districtPatientCount) {
-                if (districtPatientCount[district] > maxCount) {
-                    maxDistrict = district;
-                    maxCount = districtPatientCount[district];
-                }
-            }
-
-            console.log(
-                `District with highest number of patients: ${maxDistrict}`
-            );
-            setHighestPatientDistrict(maxDistrict);
-        }
-    }, [NewPatientAddedEvents]);
-
     // fetch users on page load
     useEffect(() => {
         async function fetchUsers() {
@@ -286,15 +226,43 @@ export function InputForm() {
         }
     }, [userAdded]);
 
-    // calculate death rate after fetching users
+    // calculate death rate and district with highest covid patient after fetching users after fetching users
     useEffect(() => {
         if (users.length > 0) {
+            // Calculate the death rate
             const deadUsers = users.filter(
                 (user) => user.isDead === true
             ).length;
             const deathRate = deadUsers / totalDays;
             setDeathRate(deathRate);
             console.log("Death Rate:", deathRate);
+
+            // Calculate the district with the highest number of patients
+            const districtPatientCount: { [district: string]: number } = {};
+
+            users.forEach((user) => {
+                const district = user.district;
+                if (districtPatientCount[district]) {
+                    districtPatientCount[district]++;
+                } else {
+                    districtPatientCount[district] = 1;
+                }
+            });
+
+            let maxDistrict = Object.keys(districtPatientCount)[0];
+            let maxCount = districtPatientCount[maxDistrict];
+
+            for (const district in districtPatientCount) {
+                if (districtPatientCount[district] > maxCount) {
+                    maxDistrict = district;
+                    maxCount = districtPatientCount[district];
+                }
+            }
+
+            console.log(
+                `District with highest number of patients: ${maxDistrict}`
+            );
+            setHighestPatientDistrict(maxDistrict);
         }
     }, [users, totalDays]);
 
