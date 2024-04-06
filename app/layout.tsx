@@ -18,7 +18,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <header className="container bg-black/90 backdrop-filter backdrop-blur py-4 my-6 rounded-full text-white flex justify-between items-center shadow-lg drop-shadow-lg">
+                <header className="container bg-black/90 py-4 my-6 rounded-full text-white flex justify-between items-center shadow-lg drop-shadow-lg">
                     <h3 className="text-2xl">🏥 Patient Management</h3>
                     <nav className="space-x-6">
                         <span>
