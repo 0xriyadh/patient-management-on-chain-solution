@@ -23,6 +23,8 @@ import patientManagementContract from "../config/patientManagementContract";
 import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
 import { useStatistics } from "../hooks/useStatistics";
+import { DataTable } from "./data-table";
+import { regularStatColumns } from "./columns";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -267,6 +269,15 @@ export function InputForm() {
                     ? "Metamask Connected ✅"
                     : "Connect to Metamask"}
             </Button>
+            <DataTable
+                columns={regularStatColumns}
+                data={[
+                    {
+                        death_rate: deathRate,
+                        district: highestPatientDistrict,
+                    },
+                ]}
+            />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
