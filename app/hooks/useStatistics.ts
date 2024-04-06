@@ -7,6 +7,9 @@ export const useStatistics = (users: User[], totalDays: number) => {
     const [medianAgeByDistrict, setMedianAgeByDistrict] = useState<{
         [district: string]: number;
     }>({});
+    const [ageGroupPercentages, setAgeGroupPercentages] = useState<{
+        [ageGroup: string]: number;
+    }>({});
 
     const calculateDeathRate = () => {
         const deadUsers = users.filter((user) => user.isDead).length;
@@ -67,13 +70,52 @@ export const useStatistics = (users: User[], totalDays: number) => {
         setMedianAgeByDistrict(medianAgeByDistrict);
     };
 
+    const calculateAgeGroupPercentages = () => {
+        const ageGroups: { [ageGroup: string]: number } = {
+            children: 0,
+            teenagers: 0,
+            young: 0,
+            elder: 0,
+        };
+
+        users.forEach((user) => {
+            if (user.age < 13) {
+                ageGroups["children"]++;
+            } else if (user.age < 20) {
+                ageGroups["teenagers"]++;
+            } else if (user.age < 50) {
+                ageGroups["young"]++;
+            } else {
+                ageGroups["elder"]++;
+            }
+        });
+
+        for (const ageGroup in ageGroups) {
+            ageGroups[ageGroup as keyof typeof ageGroups] = Number(
+                (
+                    (ageGroups[ageGroup as keyof typeof ageGroups] /
+                        users.length) *
+                    100
+                ).toFixed(2)
+            );
+        }
+
+        setAgeGroupPercentages(ageGroups);
+    };
+
     useEffect(() => {
         if (users.length > 0) {
             calculateDeathRate();
             calculateHighestPatientDistrict();
             calculateMedianAge();
+            calculateAgeGroupPercentages();
         }
     }, [users, totalDays]);
 
-    return { deathRate, highestPatientDistrict, medianAgeByDistrict };
+    return {
+        deathRate,
+        highestPatientDistrict,
+        medianAgeByDistrict,
+        ageGroupPercentages,
+    };
 };

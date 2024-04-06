@@ -48,8 +48,12 @@ export function InputForm() {
     const [users, setUsers] = useState<User[]>([]);
     // total num of days since the first block was created
     const [totalDays, setTotalDays] = useState(0);
-    const { deathRate, highestPatientDistrict, medianAgeByDistrict } =
-        useStatistics(users, totalDays);
+    const {
+        deathRate,
+        highestPatientDistrict,
+        medianAgeByDistrict,
+        ageGroupPercentages,
+    } = useStatistics(users, totalDays);
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
@@ -79,9 +83,9 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Feni",
+                    "Cumilla",
                     "No Symptoms",
-                    false,
+                    true,
                     0
                 )
                 .send({ from: connectedAccount || "" })
@@ -242,12 +246,26 @@ export function InputForm() {
                     </li>
                 ))}
             </ul>
-            <Button disabled={!!connectedAccount} type="submit" onClick={connectMetamask}>
-                {
-                    connectedAccount
-                        ? "Metamask Connected ✅"
-                        : "Connect to Metamask"
-                }
+
+            {/* Percentage of Age Groups */}
+            <h1 className="text-lg">Percentage of Age Groups:</h1>
+            <ul>
+                {Object.entries(ageGroupPercentages).map(
+                    ([ageGroup, percentage]) => (
+                        <li key={ageGroup}>
+                            {ageGroup}: {percentage}%
+                        </li>
+                    )
+                )}
+            </ul>
+            <Button
+                disabled={!!connectedAccount}
+                type="submit"
+                onClick={connectMetamask}
+            >
+                {connectedAccount
+                    ? "Metamask Connected ✅"
+                    : "Connect to Metamask"}
             </Button>
             <Form {...form}>
                 <form
