@@ -89,7 +89,7 @@ export function InputForm() {
                     data.age,
                     0,
                     0,
-                    "Cumilla",
+                    "Barishal",
                     "No Symptoms",
                     true,
                     0
