@@ -22,6 +22,7 @@ import provider from "../utils/web3Provider";
 import patientManagementContract from "../config/patientManagementContract";
 import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
+import { useStatistics } from "../hooks/useStatistics";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -45,15 +46,15 @@ export function InputForm() {
         []
     );
     const [users, setUsers] = useState<User[]>([]);
+    // total num of days since the first block was created
+    const [totalDays, setTotalDays] = useState(0);
+    const { deathRate, highestPatientDistrict } = useStatistics(
+        users,
+        totalDays
+    );
     const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
     const [userUpdated, setUserUpdated] = useState(false);
-    // death rate per day
-    const [deathRate, setDeathRate] = useState(0);
-    // total num of days since the first block was created
-    const [totalDays, setTotalDays] = useState(0);
-    // district with highest number of patients
-    const [highestPatientDistrict, setHighestPatientDistrict] = useState("");
 
     const getOwnerAddress = async (): Promise<string> => {
         const result = (await patientManagementContract.methods
@@ -225,46 +226,6 @@ export function InputForm() {
             setUserAdded(false);
         }
     }, [userAdded]);
-
-    // calculate death rate and district with highest covid patient after fetching users after fetching users
-    useEffect(() => {
-        if (users.length > 0) {
-            // Calculate the death rate
-            const deadUsers = users.filter(
-                (user) => user.isDead === true
-            ).length;
-            const deathRate = deadUsers / totalDays;
-            setDeathRate(deathRate);
-            console.log("Death Rate:", deathRate);
-
-            // Calculate the district with the highest number of patients
-            const districtPatientCount: { [district: string]: number } = {};
-
-            users.forEach((user) => {
-                const district = user.district;
-                if (districtPatientCount[district]) {
-                    districtPatientCount[district]++;
-                } else {
-                    districtPatientCount[district] = 1;
-                }
-            });
-
-            let maxDistrict = Object.keys(districtPatientCount)[0];
-            let maxCount = districtPatientCount[maxDistrict];
-
-            for (const district in districtPatientCount) {
-                if (districtPatientCount[district] > maxCount) {
-                    maxDistrict = district;
-                    maxCount = districtPatientCount[district];
-                }
-            }
-
-            console.log(
-                `District with highest number of patients: ${maxDistrict}`
-            );
-            setHighestPatientDistrict(maxDistrict);
-        }
-    }, [users, totalDays]);
 
     return (
         <>
