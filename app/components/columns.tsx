@@ -35,3 +35,20 @@ export const medianAgePerDistrictColumns: ColumnDef<MedianAgePerDistrict>[] = [
         header: "Median Age",
     },
 ];
+
+export type PercentageOfPatientsPerAgeGroup = {
+    group: string;
+    percentage: number;
+};
+
+export const percentageOfPatientsPerAgeGroupColumns: ColumnDef<PercentageOfPatientsPerAgeGroup>[] =
+    [
+        {
+            accessorKey: "group",
+            header: "Age Group",
+        },
+        {
+            accessorKey: "percentage",
+            header: "Percentage (%)",
+        },
+    ];

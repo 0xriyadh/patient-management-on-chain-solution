@@ -24,7 +24,11 @@ import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
 import { useStatistics } from "../hooks/useStatistics";
 import { DataTable } from "./data-table";
-import { medianAgePerDistrictColumns, regularStatColumns } from "./columns";
+import {
+    medianAgePerDistrictColumns,
+    percentageOfPatientsPerAgeGroupColumns,
+    regularStatColumns,
+} from "./columns";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -232,15 +236,61 @@ export function InputForm() {
     }, [userAdded]);
 
     useEffect(() => {
-        const test = Object.entries(medianAgeByDistrict).map(
-            ([district, age]) =>
-                ({ district, age } as { district: string; age: number })
+        const test = Object.entries(ageGroupPercentages).map(
+            ([group, percentage]) =>
+                ({ group, percentage } as { group: string; percentage: number })
         );
         console.log(test);
-    }, [medianAgeByDistrict]);
+    }, [ageGroupPercentages]);
 
     return (
         <>
+            <div className="space-y-10 my-20">
+                <div>
+                    <h1 className="text-2xl text-center font-medium mb-3">
+                        Death Rate & District with Highest Covid Patients
+                    </h1>
+                    <DataTable
+                        columns={regularStatColumns}
+                        data={[
+                            {
+                                death_rate: deathRate,
+                                district: highestPatientDistrict,
+                            },
+                        ]}
+                    />
+                </div>
+                <div>
+                    <h1 className="text-2xl text-center font-medium mb-3">
+                        Median Age By District
+                    </h1>
+                    <DataTable
+                        columns={medianAgePerDistrictColumns}
+                        data={Object.entries(medianAgeByDistrict).map(
+                            ([district, age]) =>
+                                ({ district, age } as {
+                                    district: string;
+                                    age: number;
+                                })
+                        )}
+                    />
+                </div>
+                <div>
+                    <h1 className="text-2xl text-center font-medium mb-3">
+                        Percentage of Patients Per Age Group
+                    </h1>
+                    <DataTable
+                        columns={percentageOfPatientsPerAgeGroupColumns}
+                        data={Object.entries(ageGroupPercentages).map(
+                            ([group, percentage]) =>
+                                ({ group, percentage } as {
+                                    group: string;
+                                    percentage: number;
+                                })
+                        )}
+                    />
+                </div>
+            </div>
             <h1 className="text-2xl">Owner Address: {owner}</h1>
             <h1 className="text-2xl">Connected Account: {connectedAccount}</h1>
             <h1 className="text-lg">Death Rate: {deathRate}</h1>
@@ -277,29 +327,6 @@ export function InputForm() {
                     ? "Metamask Connected ✅"
                     : "Connect to Metamask"}
             </Button>
-            <DataTable
-                columns={regularStatColumns}
-                data={[
-                    {
-                        death_rate: deathRate,
-                        district: highestPatientDistrict,
-                    },
-                ]}
-            />
-            <DataTable
-                columns={medianAgePerDistrictColumns}
-                data={Object.entries(medianAgeByDistrict).map(
-                    ([district, age]) =>
-                        ({ district, age } as { district: string; age: number })
-                )}
-            />
-            <DataTable
-                columns={medianAgePerDistrictColumns}
-                data={Object.entries(medianAgeByDistrict).map(
-                    ([district, age]) =>
-                        ({ district, age } as { district: string; age: number })
-                )}
-            />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
