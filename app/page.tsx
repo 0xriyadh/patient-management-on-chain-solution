@@ -1,9 +1,9 @@
-import { InputForm } from "./components/InputForm";
+import { AddUserForm } from "./components/AddUserForm";
 
 export default function Home() {
-  return (
-      <main className="container mx-auto">
-          <InputForm />
-      </main>
-  );
+    return (
+        <main className="container mx-auto">
+            <AddUserForm />
+        </main>
+    );
 }

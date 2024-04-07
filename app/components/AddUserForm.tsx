@@ -43,7 +43,7 @@ const FormSchema = z.object({
     ),
 });
 
-export function InputForm() {
+export function AddUserForm() {
     const [owner, setOwner] = useState<string | null>(null);
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
