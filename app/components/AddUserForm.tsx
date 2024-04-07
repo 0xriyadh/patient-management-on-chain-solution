@@ -18,7 +18,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import provider from "../utils/web3Provider";
 import patientManagementContract from "../config/patientManagementContract";
 import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
@@ -29,6 +28,7 @@ import {
     percentageOfPatientsPerAgeGroupColumns,
     regularStatColumns,
 } from "./stat-tables/columns";
+import usePastEvents from "../hooks/usePastEvents";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -48,12 +48,8 @@ export function AddUserForm() {
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
     );
-    const [NewPatientAddedEvents, setNewPatientAddedEvents] = useState<any[]>(
-        []
-    );
     const [users, setUsers] = useState<User[]>([]);
-    // total num of days since the first block was created
-    const [totalDays, setTotalDays] = useState(0);
+    const { totalDays } = usePastEvents(patientManagementContract);
     const {
         deathRate,
         highestPatientDistrict,
@@ -135,92 +131,6 @@ export function AddUserForm() {
         });
     });
 
-    useEffect(() => {
-        const getPastEvents = async () => {
-            if (patientManagementContract) {
-                const events = await (
-                    patientManagementContract.getPastEvents as any
-                )("NewPatientAdded", {
-                    fromBlock: 0,
-                    toBlock: "latest",
-                });
-
-                setNewPatientAddedEvents(events);
-                console.log(events);
-
-                // consoling the times each events were emitted at
-                /*
-                    for (const event of events) {
-                        const block = await provider.eth.getBlock(
-                            event.blockNumber
-                        );
-                        const timestamp = block.timestamp;
-
-                        console.log(
-                            "Event emitted at",
-                            new Date(Number(timestamp) * 1000)
-                        );
-                    }
-                */
-
-                // calculating from first block to latest
-                /*
-                    if (events.length > 0) {
-                        // Get the timestamp of the first block
-                        const firstBlock = await provider.eth.getBlock(
-                            events[0].blockNumber
-                        );
-                        const firstTimestamp = firstBlock.timestamp;
-
-                        // Get the timestamp of the latest block
-                        const latestBlock = await provider.eth.getBlock("latest");
-                        const latestTimestamp = latestBlock.timestamp;
-
-                        // Calculate the number of days from the first block to the latest
-                        const days = Math.ceil(
-                            Number(latestTimestamp - firstTimestamp) /
-                                (60 * 60 * 24)
-                        );
-                        console.log(
-                            "Number of days from the first block to the latest:",
-                            days
-                        );
-                    } 
-                */
-
-                // calculating from first block to now
-                if (events.length > 0) {
-                    // Get the timestamp of the first block
-                    const firstBlock = await provider.eth.getBlock(
-                        events[0].blockNumber
-                    );
-                    const firstTimestamp = firstBlock.timestamp;
-
-                    // Get the current timestamp in seconds
-                    const currentTimestamp = Math.floor(Date.now() / 1000);
-
-                    // Calculate the number of days from the first block to the current time
-                    const days = Math.ceil(
-                        (currentTimestamp - Number(firstTimestamp)) /
-                            (60 * 60 * 24)
-                    );
-                    console.log(
-                        "Number of days from the first block to the current time:",
-                        days
-                    );
-                    setTotalDays(days);
-                }
-            }
-        };
-
-        // Only get past events if a new user has been added
-        if (userAdded || !NewPatientAddedEvents.length) {
-            getPastEvents();
-            // Reset userAdded to false after getting past events
-            setUserAdded(false);
-        }
-    }, [userAdded, NewPatientAddedEvents.length]);
-
     // fetch users on page load
     useEffect(() => {
         async function fetchUsers() {
@@ -234,15 +144,7 @@ export function AddUserForm() {
             setUserAdded(false);
         }
     }, [userAdded]);
-
-    useEffect(() => {
-        const test = Object.entries(ageGroupPercentages).map(
-            ([group, percentage]) =>
-                ({ group, percentage } as { group: string; percentage: number })
-        );
-        console.log(test);
-    }, [ageGroupPercentages]);
-
+    
     return (
         <>
             <div className="space-y-10 my-10">

@@ -1,8 +1,43 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
-import { medianAgePerDistrictColumns, percentageOfPatientsPerAgeGroupColumns, regularStatColumns } from "./columns";
+import {
+    medianAgePerDistrictColumns,
+    percentageOfPatientsPerAgeGroupColumns,
+    regularStatColumns,
+} from "./columns";
+import usePastEvents from "@/app/hooks/usePastEvents";
+import patientManagementContract from "../../config/patientManagementContract";
+import { User } from "../../types/userTypes";
+import { useStatistics } from "@/app/hooks/useStatistics";
+import { getAllUsers } from "../../utils/users";
 
 const StatTables = () => {
+    const [users, setUsers] = useState<User[]>([]);
+    const [userAdded, setUserAdded] = useState(false);
+
+    const { totalDays } = usePastEvents(patientManagementContract);
+    const {
+        deathRate,
+        highestPatientDistrict,
+        medianAgeByDistrict,
+        ageGroupPercentages,
+    } = useStatistics(users, totalDays);
+
+    // fetch users on page load
+    useEffect(() => {
+        async function fetchUsers() {
+            const fetchedUsers = await getAllUsers();
+            setUsers(fetchedUsers);
+        }
+
+        fetchUsers();
+
+        if (userAdded) {
+            setUserAdded(false);
+        }
+    }, [userAdded]);
     return (
         <div className="space-y-10 my-10">
             <div>
