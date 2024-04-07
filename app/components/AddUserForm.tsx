@@ -23,12 +23,12 @@ import patientManagementContract from "../config/patientManagementContract";
 import { getAllUsers } from "../utils/users";
 import { User } from "../types/userTypes";
 import { useStatistics } from "../hooks/useStatistics";
-import { DataTable } from "./data-table";
+import { DataTable } from "./stat-tables/data-table";
 import {
     medianAgePerDistrictColumns,
     percentageOfPatientsPerAgeGroupColumns,
     regularStatColumns,
-} from "./columns";
+} from "./stat-tables/columns";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
