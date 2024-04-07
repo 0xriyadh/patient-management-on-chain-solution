@@ -1,4 +1,4 @@
-import { AddUserForm } from "@/app/components/AddUserForm";
+import { AddUserForm } from "@/app/components/add-user-form";
 import React from "react";
 
 const Page = () => {

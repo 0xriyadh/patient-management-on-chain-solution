@@ -1,5 +1,5 @@
-import { AddUserForm } from "./components/AddUserForm";
-import StatTables from "./components/stat-tables/StatTables";
+import { AddUserForm } from "./components/add-user-form";
+import StatTables from "./components/stat-tables/stat-tables";
 
 export default function Home() {
     return (
