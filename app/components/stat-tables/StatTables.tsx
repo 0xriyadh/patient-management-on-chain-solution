@@ -38,6 +38,33 @@ const StatTables = () => {
             setUserAdded(false);
         }
     }, [userAdded]);
+
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (patientManagementContract) {
+                try {
+                    // Listen for new events
+                    (patientManagementContract.events.NewPatientAdded as any)({
+                        filter: {}, // You can filter the events here
+                    })
+                        .on("data", (event: any) => {
+                            console.log("New NewPatientAdded event", event);
+                            setUserAdded(true);
+                        })
+                        .on("error", console.error);
+
+                    // Fetch users data again
+                    const fetchedUsers = await getAllUsers();
+                    setUsers(fetchedUsers);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+
     return (
         <div className="space-y-10 my-10">
             <div>

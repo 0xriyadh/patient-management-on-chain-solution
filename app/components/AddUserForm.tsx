@@ -65,7 +65,7 @@ export function AddUserForm() {
                     data.age,
                     0,
                     0,
-                    "Barishal",
+                    "Bogra",
                     "No Symptoms",
                     true,
                     0
