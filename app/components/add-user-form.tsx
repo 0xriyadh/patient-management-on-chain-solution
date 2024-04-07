@@ -89,13 +89,13 @@ export function AddUserForm() {
             patientManagementContract.methods
                 .addUser(
                     data.ethAddress,
-                    data.age,
-                    data.gender,
-                    data.vaccine_status,
+                    parseInt(data.age, 10), // Convert age to number
+                    parseInt(data.gender, 10), // Convert gender to number
+                    parseInt(data.vaccine_status, 10), // Convert vaccine_status to number
                     data.district,
                     data.symptoms_details,
-                    data.is_dead,
-                    data.role
+                    data.is_dead === "true", // Convert is_dead to boolean
+                    parseInt(data.role, 10) // Convert role to number
                 )
                 .send({ from: connectedAccount || "" })
                 .then(() => {
@@ -148,10 +148,13 @@ export function AddUserForm() {
                     </span>
                 </Button>
             </div>
+            <h3 className="text-3xl font-medium w-2/3 space-y-2 mx-auto mb-6">
+                Add a Patient
+            </h3>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="w-2/3 space-y-2"
+                    className="w-2/3 space-y-2 mx-auto"
                 >
                     <FormField
                         control={form.control}
@@ -192,12 +195,22 @@ export function AddUserForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Gender</FormLabel>
-                                <FormControl>
-                                    <select {...field}>
-                                        <option value="0">Male</option>
-                                        <option value="1">Female</option>
-                                    </select>
-                                </FormControl>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value.toString()}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Kindly select patient's gender" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="0">Male</SelectItem>
+                                        <SelectItem value="1">
+                                            Female
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -208,15 +221,27 @@ export function AddUserForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Vaccine Status</FormLabel>
-                                <FormControl>
-                                    <select {...field}>
-                                        <option value="0">
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value.toString()}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Kindly select patient's vaccine status" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="0">
                                             Not Vaccinated
-                                        </option>
-                                        <option value="1">One Dose</option>
-                                        <option value="2">Two Doses</option>
-                                    </select>
-                                </FormControl>
+                                        </SelectItem>
+                                        <SelectItem value="1">
+                                            One Dose
+                                        </SelectItem>
+                                        <SelectItem value="2">
+                                            Two Dose
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -304,8 +329,12 @@ export function AddUserForm() {
                             </FormItem>
                         )}
                     />
-                    <Button disabled={!connectedAccount} type="submit">
-                        Submit
+                    <Button
+                        disabled={!connectedAccount}
+                        type="submit"
+                        size="lg"
+                    >
+                        Add Patient
                     </Button>
                 </form>
             </Form>
