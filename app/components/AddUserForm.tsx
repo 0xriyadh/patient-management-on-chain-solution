@@ -19,16 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import patientManagementContract from "../config/patientManagementContract";
-import { getAllUsers } from "../utils/users";
-import { User } from "../types/userTypes";
-import { useStatistics } from "../hooks/useStatistics";
-import { DataTable } from "./stat-tables/data-table";
-import {
-    medianAgePerDistrictColumns,
-    percentageOfPatientsPerAgeGroupColumns,
-    regularStatColumns,
-} from "./stat-tables/columns";
-import usePastEvents from "../hooks/usePastEvents";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -48,17 +38,7 @@ export function AddUserForm() {
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
     );
-    const [users, setUsers] = useState<User[]>([]);
-    const { totalDays } = usePastEvents(patientManagementContract);
-    const {
-        deathRate,
-        highestPatientDistrict,
-        medianAgeByDistrict,
-        ageGroupPercentages,
-    } = useStatistics(users, totalDays);
-    const [APatientIsDeadEvents, setAPatientIsDeadEvents] = useState<any[]>([]);
     const [userAdded, setUserAdded] = useState(false);
-    const [userUpdated, setUserUpdated] = useState(false);
 
     const getOwnerAddress = async (): Promise<string> => {
         const result = (await patientManagementContract.methods
@@ -131,95 +111,10 @@ export function AddUserForm() {
         });
     });
 
-    // fetch users on page load
-    useEffect(() => {
-        async function fetchUsers() {
-            const fetchedUsers = await getAllUsers();
-            setUsers(fetchedUsers);
-        }
-
-        fetchUsers();
-
-        if (userAdded) {
-            setUserAdded(false);
-        }
-    }, [userAdded]);
-    
     return (
         <>
-            <div className="space-y-10 my-10">
-                <div>
-                    <h1 className="text-2xl text-center font-medium mb-3">
-                        Death Rate & District with Highest Covid Patients
-                    </h1>
-                    <DataTable
-                        columns={regularStatColumns}
-                        data={[
-                            {
-                                death_rate: deathRate,
-                                district: highestPatientDistrict,
-                            },
-                        ]}
-                    />
-                </div>
-                <div>
-                    <h1 className="text-2xl text-center font-medium mb-3">
-                        Median Age By District
-                    </h1>
-                    <DataTable
-                        columns={medianAgePerDistrictColumns}
-                        data={Object.entries(medianAgeByDistrict).map(
-                            ([district, age]) =>
-                                ({ district, age } as {
-                                    district: string;
-                                    age: number;
-                                })
-                        )}
-                    />
-                </div>
-                <div>
-                    <h1 className="text-2xl text-center font-medium mb-3">
-                        Percentage of Patients Per Age Group
-                    </h1>
-                    <DataTable
-                        columns={percentageOfPatientsPerAgeGroupColumns}
-                        data={Object.entries(ageGroupPercentages).map(
-                            ([group, percentage]) =>
-                                ({ group, percentage } as {
-                                    group: string;
-                                    percentage: number;
-                                })
-                        )}
-                    />
-                </div>
-            </div>
             <h1 className="text-2xl">Owner Address: {owner}</h1>
             <h1 className="text-2xl">Connected Account: {connectedAccount}</h1>
-            <h1 className="text-lg">Death Rate: {deathRate}</h1>
-            <h1 className="text-lg">
-                Highest Covid Patient&apos;s District: {highestPatientDistrict}
-            </h1>
-            {/* Median Ages By District */}
-            <h1 className="text-lg">Median Ages By District:</h1>
-            <ul>
-                {Object.entries(medianAgeByDistrict).map(([district, age]) => (
-                    <li key={district}>
-                        {district}: {age}
-                    </li>
-                ))}
-            </ul>
-
-            {/* Percentage of Age Groups */}
-            <h1 className="text-lg">Percentage of Age Groups:</h1>
-            <ul>
-                {Object.entries(ageGroupPercentages).map(
-                    ([ageGroup, percentage]) => (
-                        <li key={ageGroup}>
-                            {ageGroup}: {percentage}%
-                        </li>
-                    )
-                )}
-            </ul>
             <Button
                 disabled={!!connectedAccount}
                 type="submit"
