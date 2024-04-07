@@ -113,17 +113,24 @@ export function AddUserForm() {
 
     return (
         <>
-            <h1 className="text-2xl">Owner Address: {owner}</h1>
-            <h1 className="text-2xl">Connected Account: {connectedAccount}</h1>
-            <Button
-                disabled={!!connectedAccount}
-                type="submit"
-                onClick={connectMetamask}
-            >
-                {connectedAccount
-                    ? "Metamask Connected ✅"
-                    : "Connect to Metamask"}
-            </Button>
+            <div className="flex justify-center my-10">
+                <Button
+                    disabled={!!connectedAccount}
+                    type="submit"
+                    onClick={connectMetamask}
+                    className="space-x-2"
+                    size={"lg"}
+                >
+                    <span className="text-2xl">
+                        {connectedAccount ? "✅" : "🦊"}
+                    </span>
+                    <span>
+                        {connectedAccount
+                            ? `${connectedAccount}`
+                            : "Connect to Metamask"}
+                    </span>
+                </Button>
+            </div>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
