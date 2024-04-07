@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -19,6 +20,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import patientManagementContract from "../config/patientManagementContract";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import Link from "next/link";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -31,6 +41,27 @@ const FormSchema = z.object({
             message: "Expected a positive number",
         }
     ),
+    gender: z.enum(["0", "1"]).refine((value) => ["0", "1"].includes(value), {
+        message: "Gender must be either '0' (Male) or '1' (Female)",
+    }),
+    vaccine_status: z
+        .enum(["0", "1", "2"])
+        .refine((value) => ["0", "1", "2"].includes(value), {
+            message:
+                "Vaccine status must be '0' (Not Vaccinated), '1' (One Dose), or '2' (Two Doses)",
+        }),
+    district: z.string().nonempty({ message: "District is required" }),
+    symptoms_details: z
+        .string()
+        .nonempty({ message: "Symptoms details are required" }),
+    is_dead: z
+        .enum(["true", "false"])
+        .refine((value) => ["true", "false"].includes(value), {
+            message: "Is Dead must be either 'true' or 'false'",
+        }),
+    role: z.enum(["0", "1"]).refine((value) => ["0", "1"].includes(value), {
+        message: "Role must be either '0' (Patient) or '1' (Admin)",
+    }),
 });
 
 export function AddUserForm() {
@@ -43,6 +74,12 @@ export function AddUserForm() {
         defaultValues: {
             ethAddress: "",
             age: "",
+            gender: "0",
+            vaccine_status: "0",
+            district: "",
+            symptoms_details: "",
+            is_dead: "false",
+            role: "0",
         },
     });
 
@@ -53,17 +90,14 @@ export function AddUserForm() {
                 .addUser(
                     data.ethAddress,
                     data.age,
-                    0,
-                    0,
-                    "Bogra",
-                    "No Symptoms",
-                    true,
-                    0
+                    data.gender,
+                    data.vaccine_status,
+                    data.district,
+                    data.symptoms_details,
+                    data.is_dead,
+                    data.role
                 )
                 .send({ from: connectedAccount || "" })
-                // .on("receipt", function (receipt) {
-                //     console.log(receipt.events); // All the events from the receipt
-                // })
                 .then(() => {
                     console.log("Success");
                 })
@@ -148,6 +182,124 @@ export function AddUserForm() {
                                         {...field}
                                     />
                                 </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Gender</FormLabel>
+                                <FormControl>
+                                    <select {...field}>
+                                        <option value="0">Male</option>
+                                        <option value="1">Female</option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="vaccine_status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Vaccine Status</FormLabel>
+                                <FormControl>
+                                    <select {...field}>
+                                        <option value="0">
+                                            Not Vaccinated
+                                        </option>
+                                        <option value="1">One Dose</option>
+                                        <option value="2">Two Doses</option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="district"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>District</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="District" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="symptoms_details"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Symptoms Details</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Symptoms Details"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="is_dead"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Is Dead?</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value.toString()}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a verified email to display" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="false">
+                                            No
+                                        </SelectItem>
+                                        <SelectItem value="true">
+                                            Yes
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Select Role</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value.toString()}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a verified email to display" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="0">
+                                            Patient
+                                        </SelectItem>
+                                        <SelectItem value="1">Admin</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
