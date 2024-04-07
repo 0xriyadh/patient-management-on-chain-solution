@@ -1,7 +1,7 @@
 "use client";
 
 import { Web3 } from "web3";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,19 +34,9 @@ const FormSchema = z.object({
 });
 
 export function AddUserForm() {
-    const [owner, setOwner] = useState<string | null>(null);
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
     );
-    const [userAdded, setUserAdded] = useState(false);
-
-    const getOwnerAddress = async (): Promise<string> => {
-        const result = (await patientManagementContract.methods
-            .getOwner()
-            .call()) as string;
-
-        return result;
-    };
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -76,7 +66,6 @@ export function AddUserForm() {
                 // })
                 .then(() => {
                     console.log("Success");
-                    setUserAdded(true);
                 })
                 .catch((err: Error) => {
                     console.error(err.message);
@@ -104,12 +93,6 @@ export function AddUserForm() {
             alert("Please download metamask");
         }
     }
-
-    useEffect(() => {
-        getOwnerAddress().then((result: string) => {
-            setOwner(result);
-        });
-    });
 
     return (
         <>
