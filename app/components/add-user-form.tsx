@@ -154,7 +154,7 @@ export function AddUserForm() {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="w-2/3 space-y-2 mx-auto"
+                    className="w-2/3 space-y-2 mx-auto mb-16"
                 >
                     <FormField
                         control={form.control}
@@ -333,8 +333,9 @@ export function AddUserForm() {
                         disabled={!connectedAccount}
                         type="submit"
                         size="lg"
+                        className="mt-10"
                     >
-                        Add Patient
+                        Add Patient {!connectedAccount && "(Connect Metamask)"}
                     </Button>
                 </form>
             </Form>
