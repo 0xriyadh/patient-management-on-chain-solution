@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
+import { BANGLADESH_DISTRICTS } from "../data/constant-bd-districts";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -51,7 +52,7 @@ const FormSchema = z.object({
             message:
                 "Vaccine status must be '0' (Not Vaccinated), '1' (One Dose), or '2' (Two Doses)",
         }),
-    district: z.string().nonempty({ message: "District is required" }),
+    district: z.enum(BANGLADESH_DISTRICTS as [string, ...string[]]),
     symptoms_details: z
         .string()
         .nonempty({ message: "Symptoms details are required" }),
@@ -75,12 +76,12 @@ export function AddUserForm() {
         defaultValues: {
             ethAddress: "",
             age: "",
-            gender: "0",
-            vaccine_status: "0",
-            district: "",
+            gender: undefined,
+            vaccine_status: undefined,
+            district: undefined,
             symptoms_details: "",
-            is_dead: "false",
-            role: "0",
+            is_dead: undefined,
+            role: undefined,
         },
     });
 
@@ -198,7 +199,7 @@ export function AddUserForm() {
                                 <FormLabel>Gender</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value.toString()}
+                                    defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -224,7 +225,7 @@ export function AddUserForm() {
                                 <FormLabel>Vaccine Status</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value.toString()}
+                                    defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -253,9 +254,28 @@ export function AddUserForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>District</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="District" {...field} />
-                                </FormControl>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Kindly select a district" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {BANGLADESH_DISTRICTS.map(
+                                            (district) => (
+                                                <SelectItem
+                                                    key={district}
+                                                    value={district}
+                                                >
+                                                    {district}
+                                                </SelectItem>
+                                            )
+                                        )}
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -285,11 +305,11 @@ export function AddUserForm() {
                                 <FormLabel>Is Dead?</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value.toString()}
+                                    defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a verified email to display" />
+                                            <SelectValue placeholder="Is the user dead?" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -313,11 +333,11 @@ export function AddUserForm() {
                                 <FormLabel>Select Role</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value.toString()}
+                                    defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a verified email to display" />
+                                            <SelectValue placeholder="Select the role of the user" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -337,7 +357,7 @@ export function AddUserForm() {
                         size="lg"
                         className="mt-10"
                     >
-                        Add Patient {!connectedAccount && "(Connect Metamask)"}
+                        Add User {!connectedAccount && "(Connect Metamask)"}
                     </Button>
                 </form>
             </Form>
