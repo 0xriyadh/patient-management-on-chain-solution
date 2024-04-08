@@ -206,7 +206,7 @@ export function UpdateUserForm() {
                         size="lg"
                         className="mt-10"
                     >
-                        Add User {!connectedAccount && "(Connect Metamask)"}
+                        Update Patient {!connectedAccount && "(Connect Metamask)"}
                     </Button>
                 </form>
             </Form>

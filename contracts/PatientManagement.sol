@@ -125,6 +125,21 @@ contract PatientManagement {
         );
     }
 
+    function canThisUserDownloadCertificate(
+        address _address
+    ) public view returns (bool) {
+        if (s_addressToUser[_address].id == 0) {
+            revert PatientManagement_DidNotFindUser();
+        }
+
+        if (
+            s_addressToUser[_address].vaccine_status == VaccineStatus.two_dose
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     function getUserCount() public view returns (uint256) {
         return s_userCount;
     }
