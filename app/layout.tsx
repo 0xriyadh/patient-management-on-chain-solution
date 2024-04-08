@@ -31,6 +31,11 @@ export default function RootLayout({
                         <span>
                             <Link href="/user/update">Update User</Link>
                         </span>
+                        <span>
+                            <Link href="/user/certificate">
+                                Download Certificate
+                            </Link>
+                        </span>
                     </nav>
                 </header>
                 {children}
