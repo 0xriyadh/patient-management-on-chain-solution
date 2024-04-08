@@ -29,6 +29,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -266,8 +267,9 @@ export function AddUserForm() {
                             <FormItem>
                                 <FormLabel>Symptoms Details</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        placeholder="Symptoms Details"
+                                    <Textarea
+                                        placeholder="State symptoms details here..."
+                                        className="resize-none"
                                         {...field}
                                     />
                                 </FormControl>
