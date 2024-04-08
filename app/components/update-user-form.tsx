@@ -65,7 +65,7 @@ const FormSchema = z.object({
     }),
 });
 
-export function AddUserForm() {
+export function UpdateUserForm() {
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
     );
