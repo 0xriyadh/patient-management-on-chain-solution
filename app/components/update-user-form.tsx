@@ -1,7 +1,7 @@
 "use client";
 
 import { Web3 } from "web3";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,8 +26,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { BANGLADESH_DISTRICTS } from "../data/constant-bd-districts";
 import { toast } from "sonner";
+import { getAllUsers } from "../utils/users";
+import { User } from "../types/userTypes";
 
 const FormSchema = z.object({
     ethAddress: z.custom<string>(isAddress, "Invalid Address"),
@@ -44,7 +45,16 @@ const FormSchema = z.object({
         }),
 });
 
+const VaccineStatus: { [key: number]: string } = {
+    0: "Not Vaccinated",
+    1: "One Dose",
+    2: "Two Dose",
+};
+
 export function UpdateUserForm() {
+    const [users, setUsers] = useState<User[]>([]);
+    const [userAdded, setUserAdded] = useState(false);
+    const [userUpdated, setUserUpdated] = useState(false);
     const [connectedAccount, setConnectedAccount] = useState<string | null>(
         null
     );
@@ -96,6 +106,66 @@ export function UpdateUserForm() {
             alert("Please download metamask");
         }
     }
+
+    // fetch users on page load
+    useEffect(() => {
+        async function fetchUsers() {
+            const fetchedUsers = await getAllUsers();
+            setUsers(fetchedUsers);
+        }
+
+        fetchUsers();
+
+        if (userAdded || userUpdated) {
+            setUserAdded(false);
+            setUserUpdated(false);
+        }
+    }, [userAdded, userUpdated]);
+
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (patientManagementContract) {
+                try {
+                    // Listen for NewPatientAdded events
+                    (patientManagementContract.events.NewPatientAdded as any)({
+                        filter: {}, // You can filter the events here
+                    })
+                        .on("data", (event: any) => {
+                            console.log("New NewPatientAdded event", event);
+                            setUserAdded(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (patientManagementContract) {
+                try {
+                    // Listen for APatientIsUpdated events
+                    (patientManagementContract.events.APatientIsUpdated as any)(
+                        {
+                            filter: {}, // You can filter the events here
+                        }
+                    )
+                        .on("data", (event: any) => {
+                            console.log("New APatientIsUpdated event", event);
+                            setUserUpdated(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
 
     return (
         <>
@@ -206,10 +276,52 @@ export function UpdateUserForm() {
                         size="lg"
                         className="mt-10"
                     >
-                        Update Patient {!connectedAccount && "(Connect Metamask)"}
+                        Update Patient{" "}
+                        {!connectedAccount && "(Connect Metamask)"}
                     </Button>
                 </form>
             </Form>
+
+            {/* showcasing all users */}
+            <div className="my-10">
+                <h3 className="text-3xl font-medium space-y-2 mx-auto mb-6">
+                    📋 All Patients
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                    {users.map((user) => (
+                        <div
+                            key={user.address}
+                            className={`p-8 bg-gray-100 rounded-md border ${
+                                user.isDead ? "bg-red-50 border-red-500" : ""
+                            } ${
+                                BigInt(user.vaccineStatus) === BigInt(2) &&
+                                !user.isDead
+                                    ? "bg-green-50 border-green-500"
+                                    : ""
+                            }`}
+                        >
+                            <div>
+                                <p className="text-sm font-medium">
+                                    {user.address}
+                                </p>
+                                <p className="text-sm">
+                                    Vaccine Status:{" "}
+                                    {
+                                        VaccineStatus[
+                                            Number(
+                                                user.vaccineStatus.toString()
+                                            )
+                                        ]
+                                    }
+                                </p>
+                                <p className="text-sm">
+                                    Is Dead: {user.isDead ? "Yes" : "No"}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </>
     );
 }
