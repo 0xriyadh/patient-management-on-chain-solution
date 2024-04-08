@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <Toaster richColors={true} />
+            <Toaster richColors position="bottom-center" />
             <body className={inter.className}>
                 <header className="container bg-black/90 py-4 my-6 rounded-full text-white flex justify-between items-center shadow-lg drop-shadow-lg">
                     <Link href="/">

@@ -85,8 +85,6 @@ export function AddUserForm() {
     });
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
-        toast.success("Patient added successfully");
         if (connectedAccount) {
             patientManagementContract.methods
                 .addUser(
@@ -101,11 +99,10 @@ export function AddUserForm() {
                 )
                 .send({ from: connectedAccount || "" })
                 .then(() => {
-                    console.log("Success");
                     toast.success("Patient added successfully");
                 })
                 .catch((err: Error) => {
-                    console.error(err.message);
+                    toast.error(err.message);
                 });
         }
     }
@@ -154,9 +151,6 @@ export function AddUserForm() {
             <h3 className="text-3xl font-medium w-2/3 space-y-2 mx-auto mb-6">
                 Add a Patient
             </h3>
-            <button onClick={() => toast.success("My first toast")}>
-                Give me a toast
-            </button>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
