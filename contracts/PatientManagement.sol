@@ -100,10 +100,6 @@ contract PatientManagement {
         s_userAddresses.push(_patientAddress);
 
         emit NewPatientAdded(_patientAddress, _age, _district);
-
-        if (_is_dead == true) {
-            emit APatientIsUpdated(_patientAddress, _age, _district, _is_dead);
-        }
     }
 
     // function to update user's vaccine status or is_dead status. Only Admin can call this function
@@ -115,17 +111,18 @@ contract PatientManagement {
         if (Role(s_addressToUser[msg.sender].role) != Role.Admin) {
             revert PatientManagement_NotAdmin();
         }
+        if (s_addressToUser[_address].id == 0) {
+            revert PatientManagement_DidNotFindUser();
+        }
         s_addressToUser[_address].vaccine_status = _vaccine_status;
         s_addressToUser[_address].is_dead = _is_dead;
 
-        if (_is_dead) {
-            emit APatientIsUpdated(
-                _address,
-                s_addressToUser[_address].age,
-                s_addressToUser[_address].district,
-                _is_dead
-            );
-        }
+        emit APatientIsUpdated(
+            _address,
+            s_addressToUser[_address].age,
+            s_addressToUser[_address].district,
+            _is_dead
+        );
     }
 
     function getUserCount() public view returns (uint256) {

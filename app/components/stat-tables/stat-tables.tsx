@@ -12,10 +12,13 @@ import patientManagementContract from "../../config/patientManagementContract";
 import { User } from "../../types/userTypes";
 import { useStatistics } from "@/app/hooks/useStatistics";
 import { getAllUsers } from "../../utils/users";
+import { set } from "zod";
+import { toast } from "sonner";
 
 const StatTables = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [userAdded, setUserAdded] = useState(false);
+    const [userUpdated, setUserUpdated] = useState(false);
 
     const { totalDays } = usePastEvents(patientManagementContract);
     const {
@@ -34,16 +37,17 @@ const StatTables = () => {
 
         fetchUsers();
 
-        if (userAdded) {
+        if (userAdded || userUpdated) {
             setUserAdded(false);
+            setUserUpdated(false);
         }
-    }, [userAdded]);
+    }, [userAdded, userUpdated]);
 
     useEffect(() => {
         const getFutureEvents = async () => {
             if (patientManagementContract) {
                 try {
-                    // Listen for new events
+                    // Listen for NewPatientAdded events
                     (patientManagementContract.events.NewPatientAdded as any)({
                         filter: {}, // You can filter the events here
                     })
@@ -52,12 +56,31 @@ const StatTables = () => {
                             setUserAdded(true);
                         })
                         .on("error", console.error);
-
-                    // Fetch users data again
-                    const fetchedUsers = await getAllUsers();
-                    setUsers(fetchedUsers);
                 } catch (error) {
-                    console.error(error);
+                    console.log(error);
+                }
+            }
+        };
+
+        getFutureEvents();
+    }, []);
+    useEffect(() => {
+        const getFutureEvents = async () => {
+            if (patientManagementContract) {
+                try {
+                    // Listen for APatientIsUpdated events
+                    (patientManagementContract.events.APatientIsUpdated as any)(
+                        {
+                            filter: {}, // You can filter the events here
+                        }
+                    )
+                        .on("data", (event: any) => {
+                            console.log("New APatientIsUpdated event", event);
+                            setUserUpdated(true);
+                        })
+                        .on("error", console.error);
+                } catch (error) {
+                    console.log(error);
                 }
             }
         };

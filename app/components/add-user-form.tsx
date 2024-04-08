@@ -161,7 +161,7 @@ export function AddUserForm() {
                         name="ethAddress"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Username</FormLabel>
+                                <FormLabel>Ethereum Address</FormLabel>
                                 <FormControl>
                                     <Input
                                         placeholder="Eth Address"
