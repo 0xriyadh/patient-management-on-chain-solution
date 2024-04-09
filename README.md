@@ -13,16 +13,18 @@ PMOCS is a blockchain-based solution for managing patient data, implemented usin
 ## Getting Started
 
 To get started with PMOCS, follow these steps:
-1. Spin up a local blockchain network using Ganache.
-clone the repository and install the dependencies:
-
+1. Spin up a local blockchain network in Ganache using the following configuration:
+    - Hostname: `127.0.0.1 (Localhost)`
+    - Port: `8545`
+    - Network ID: `5777`
+2. Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/mahadihassanriyadh/patient-management-on-chain-solution
 cd patient-management-on-chain-solution`
 npm install
 ```
-
-Then, start the local development server:
+3. Start the local development server:
 ```bash
 npm run dev
 ```
+4. Access the application at `http://localhost:3000`
