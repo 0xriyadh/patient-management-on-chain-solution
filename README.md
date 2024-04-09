@@ -2,6 +2,12 @@
 
 PMOCS is a blockchain-based solution for managing patient data, implemented using Solidity, Truffle, Ganache, and NextJs. The system allows for the registration and updating of patient records, with a focus on tracking COVID-19 trends and vaccination status.
 
+<img width="1426" alt="Screenshot 2024-04-10 at 4 19 13 AM" src="https://github.com/mahadihassanriyadh/patient-management-on-chain-solution/assets/77486566/e233921b-94e2-4c9b-a9b4-57f8dd535774">
+<img width="1429" alt="Screenshot 2024-04-10 at 4 18 37 AM" src="https://github.com/mahadihassanriyadh/patient-management-on-chain-solution/assets/77486566/7b533c60-f1f3-4f54-8ccb-99a4d6f22855">
+<img width="1429" alt="Screenshot 2024-04-10 at 4 18 37 AM" src="https://github.com/mahadihassanriyadh/patient-management-on-chain-solution/assets/77486566/58957c50-f7b7-4d2d-92aa-d39954511430">
+<img width="1424" alt="Screenshot 2024-04-10 at 4 20 04 AM" src="https://github.com/mahadihassanriyadh/patient-management-on-chain-solution/assets/77486566/050e04cc-87a7-4687-9348-26a7c553ff00">
+
+
 ## Features
 
 - **Blockchain-Based Patient Records**: Patient data is securely stored on the blockchain, ensuring data integrity and transparency.
