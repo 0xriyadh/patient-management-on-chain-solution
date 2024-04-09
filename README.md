@@ -12,7 +12,9 @@ PMOCS is a blockchain-based solution for managing patient data, implemented usin
 
 ## Getting Started
 
-To get started with PMOCS, clone the repository and install the dependencies:
+To get started with PMOCS, follow these steps:
+1. Spin up a local blockchain network using Ganache.
+clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/mahadihassanriyadh/patient-management-on-chain-solution

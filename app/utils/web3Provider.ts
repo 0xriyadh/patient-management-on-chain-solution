@@ -1,5 +1,3 @@
-// File: /config/web3.ts
-
 import Web3 from "web3";
 
 let provider: Web3;
