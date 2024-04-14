@@ -19,7 +19,7 @@ PMOCS is a blockchain-based solution for managing patient data, implemented usin
 ## Getting Started
 
 To get started with PMOCS, follow these steps:
-1. Spin up a local blockchain network in Ganache using the following configuration:
+1. Spin up a local blockchain network in [Ganache](https://archive.trufflesuite.com/ganache/) using the following configuration:
     - Hostname: `127.0.0.1 (Localhost)`
     - Port: `8545`
     - Network ID: `5777`
@@ -29,8 +29,16 @@ git clone https://github.com/mahadihassanriyadh/patient-management-on-chain-solu
 cd patient-management-on-chain-solution`
 npm install
 ```
-3. Start the local development server:
+3. Deploy the PatientManagement.sol contract on the local blockchain network (Ganache) using Truffle:
+```bash
+make migrate
+```
+or
+```bash
+truffle migrate --reset
+```
+4. Start the local development server:
 ```bash
 npm run dev
 ```
-4. Access the application at `http://localhost:3000`
+5. Access the application at `http://localhost:3000`
